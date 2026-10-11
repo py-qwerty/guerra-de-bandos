@@ -1,0 +1,9 @@
+.DS_Store
+node_modules/
+.env
+.env.*
+!.env.example
+_to_delete/
+tests/*.jpg
+tests/*-result.json
+premium-audit.json

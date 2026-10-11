@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#c8102e" />
+  
+  <link rel="manifest" href="manifest.webmanifest" />
+  <title>Guerra de Bandos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="src/style.css" />
+</head>
+<body>
+  <button id="btn-admin" data-admin-open class="sec admin-access" aria-haspopup="dialog">Administrar partida</button>
+  <!-- LOBBY -->
+  <section id="lobby" class="pantalla">
+    <h1>GUERRA<br/>DE BANDOS</h1>
+    <p class="sub">¿Dónde pasas la semana? Elige bien: no hay vuelta atrás (casi).</p>
+    <input id="in-nombre" class="nombre" maxlength="24" placeholder="Tu nombre (opcional)" />
+    <div class="opciones">
+      <button class="opcion izq" data-bando="izquierda">
+        <img alt="" /><span class="velo"></span>
+        <span class="txt"><b>⛺ ACAMPAR EN SOL</b><small>💰 100/día · Monta tiendas y suma perroflautas · 2 disparos gratis/día</small></span>
+        <a class="credito" target="_blank" rel="noopener"></a>
+      </button>
+      <button class="opcion der" data-bando="derecha">
+        <img alt="" /><span class="velo"></span>
+        <span class="txt"><b>🏢 CURRAR EN LAS TORRES</b><small>💰 200/día · Levanta oficinas y ficha currantes · 2 disparos gratis/día</small></span>
+        <a class="credito" target="_blank" rel="noopener"></a>
+      </button>
+    </div>
+    <p id="lobby-error" class="error"></p>
+  </section>
+
+  <!-- JUEGO -->
+  <section id="juego" class="pantalla oculto">
+    <header id="hud">
+      <div id="hud-estado" role="status"></div>
+      <div id="hud-tema">Tema: …</div>
+      <div id="hud-marcador"><span class="izq">⛺ 0</span> · <span class="der">0 🏢</span></div>
+      <div id="hud-municion">💰 …</div>
+    </header>
+    <div id="phaser"></div>
+    <nav id="acciones">
+      <button id="btn-construir">🧱 Construir</button>
+      <button id="btn-disparar">🎯 Disparar</button>
+      <button id="btn-voz" class="sec">🔊</button>
+      <button id="btn-compartir" class="sec">📣</button>
+      <button id="btn-admin-game" data-admin-open class="sec" type="button" aria-haspopup="dialog">Administrar partida</button>
+    </nav>
+    <div id="aviso" class="oculto"></div>
+    <div id="rotar">↻ Gira el móvil para jugar mejor</div>
+  </section>
+
+  <dialog id="admin" aria-labelledby="admin-title">
+    <header class="admin-heading"><div><p class="admin-eyebrow">GUERRA DE BANDOS · CONTROL</p><h2 id="admin-title">Administrar partida</h2></div><button id="admin-close" class="sec" aria-label="Cerrar panel">Cerrar</button></header>
+    <form id="admin-login" novalidate>
+      <p>Entra con la contraseña de administrador.</p><label for="admin-password">Contraseña de administrador</label>
+      <div class="admin-password-row"><input id="admin-password" type="password" autocomplete="current-password" aria-describedby="admin-error" maxlength="256"><button id="admin-show" type="button" class="sec" aria-pressed="false">Mostrar</button></div>
+      <button id="admin-enter" type="submit">Entrar al panel</button>
+    </form>
+    <section id="admin-controls" class="oculto" aria-label="Controles de partida">
+      <div class="admin-board"><span>PARTIDA GENERAL</span><h3 id="admin-name">España</h3><p id="admin-state" role="status"></p><p id="admin-date" class="meta"></p></div>
+      <div class="admin-actions"><button id="admin-start">Iniciar partida</button><button id="admin-end" class="sec">Terminar partida</button></div>
+      <div id="admin-confirm" class="oculto"><p>¿Terminar para todos los jugadores? Se conservará el tablero.</p><div class="admin-actions"><button id="admin-cancel" class="sec">Seguir jugando</button><button id="admin-confirm-end" class="danger">Sí, terminar partida</button></div></div>
+      <section class="admin-player-section" aria-labelledby="admin-shots-title">
+        <h3 id="admin-shots-title">Disparos de todos</h3>
+        <p>Devuelve 2 disparos gratuitos disponibles a cada jugador de esta partida. Se conserva el historial y el presupuesto.</p>
+        <button id="admin-reset-shots" type="button" class="sec">Restablecer disparos de todos</button>
+        <div id="admin-reset-confirm" class="oculto"><p>¿Devolver dos disparos a todos los jugadores? Los ataques que estén en curso podrán terminar.</p><div class="admin-actions"><button id="admin-reset-cancel" type="button" class="sec">Cancelar</button><button id="admin-reset-apply" type="button">Sí, restablecer para todos</button></div></div>
+      </section>
+      <section class="admin-player-section" aria-labelledby="admin-test-title">
+        <h3 id="admin-test-title">Probar ambos bandos</h3>
+        <p id="admin-my-team" role="status"></p>
+        <div class="admin-actions"><button id="admin-test-left" type="button">Jugar como Acampada</button><button id="admin-test-right" type="button">Jugar como Torres</button></div>
+        <p class="meta">Puedes cambiar tantas veces como quieras. Se conservan las piezas y el gasto de hoy.</p>
+      </section>
+      <section class="admin-player-section" aria-labelledby="admin-player-title">
+        <h3 id="admin-player-title">Ayudar a un jugador</h3><label for="admin-player">Jugador destinatario</label>
+        <select id="admin-player" aria-describedby="admin-player-balance"><option value="">Cargando jugadores…</option></select>
+        <p id="admin-player-balance" role="status"></p>
+        <form id="admin-budget-form" novalidate><label for="admin-amount">Créditos extra para hoy</label><div class="admin-password-row"><input id="admin-amount" type="number" min="1" max="100000" step="1" value="100" inputmode="numeric" aria-describedby="admin-error"><button id="admin-budget" type="submit">Añadir presupuesto</button></div><p class="meta">Se suman al saldo del jugador. Mañana vuelve su presupuesto diario habitual.</p></form>
+        <form id="admin-build-form" novalidate><label for="admin-piece">Qué construir</label><select id="admin-piece"></select><label for="admin-text">Mensaje de la pieza (opcional)</label><input id="admin-text" maxlength="60"><p class="meta">Se coloca para el jugador elegido, sin descontarle créditos.</p><button id="admin-build" type="submit">Construir para este jugador</button><p id="admin-build-help" class="meta"></p></form>
+      </section>
+      <footer class="admin-actions"><button id="admin-refresh" class="sec">Actualizar estado</button><button id="admin-logout" class="sec">Cerrar sesión</button></footer>
+    </section>
+    <p id="admin-error" class="error" role="alert"></p><p id="admin-feedback" role="status" aria-live="polite"></p>
+  </dialog>
+
+  <!-- MODAL genérico -->
+  <div id="modal" class="oculto">
+    <div class="modal-caja">
+      <h3 id="modal-titulo"></h3>
+      <div id="modal-cuerpo"></div>
+      <div class="modal-botones">
+        <button id="modal-cancelar" class="sec">Cancelar</button>
+        <button id="modal-ok">Aceptar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="fallo" class="oculto"></div>
+  <script>
+    function mostrarFallo(m){var f=document.getElementById('fallo');f.textContent='⚠️ '+m;f.classList.remove('oculto');}
+    window.addEventListener('error',function(e){mostrarFallo(e.message||'Error cargando '+(e.target&&e.target.src||''));},true);
+    window.addEventListener('unhandledrejection',function(e){mostrarFallo(String(e.reason&&e.reason.message||e.reason));});
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

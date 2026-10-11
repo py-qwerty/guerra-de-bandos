@@ -1,0 +1,14 @@
+-- Ejecuta tú este archivo en el editor SQL del proyecto Supabase.
+-- Sustituye el marcador por una contraseña propia de 1 a 72 bytes.
+-- No la guardes en los archivos públicos del juego ni compartas la consulta.
+do $$
+declare clave text := 'SUSTITUYE_POR_TU_CONTRASEÑA';
+begin
+ if clave='SUSTITUYE_POR_TU_CONTRASEÑA' or octet_length(clave)<1 or octet_length(clave)>72 then
+  raise exception 'Elige una contraseña de entre 1 y 72 bytes';
+ end if;
+ insert into private.admin_config(id,password_hash)
+ values(true,extensions.crypt(clave,extensions.gen_salt('bf',12)))
+ on conflict(id) do update set password_hash=excluded.password_hash;
+ delete from private.admin_sessions;
+end $$;

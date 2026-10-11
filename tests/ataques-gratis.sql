@@ -1,0 +1,33 @@
+begin;
+do $$
+declare p uuid; l uuid; r uuid; lt uuid; rt uuid; a json; b json; operation uuid:=gen_random_uuid(); blocked boolean:=false;
+begin
+ update public.partidas set activa=true where codigo='general'; select id into p from public.partidas where codigo='general';
+ insert into public.jugadores(partida_id,nombre,bando,ip) values(p,'Prueba tiros izquierda','izquierda','test-free-left') returning id into l;
+ insert into public.jugadores(partida_id,nombre,bando,ip) values(p,'Prueba tiros derecha','derecha','test-free-right') returning id into r;
+ insert into public.jugador_tokens(jugador_id) values(l) returning token into lt;
+ insert into public.jugador_tokens(jugador_id) values(r) returning token into rt;
+ perform public.poner_pieza(lt,'tienda','Prueba precio',300,714);
+ if private.saldo(l)<>90 then raise exception 'Construir no descuenta presupuesto'; end if;
+ a:=public.iniciar_ataque(lt,'piedra','Prueba',operation);
+ b:=public.iniciar_ataque(lt,'piedra','Prueba',operation);
+ if a->>'id'<>b->>'id' or (public.mis_disparos(lt)->>'usados')::int<>1 then raise exception 'Reintento duplica disparo'; end if;
+ perform public.registrar_danos(lt,'[{"id":"test-free-damage","vida":7,"roto":false,"agujeros":[]}]'::jsonb);
+ perform public.terminar_ataque(lt,(a->>'id')::uuid,'[]'::jsonb);
+ a:=public.iniciar_ataque(lt,'adoquin','Segundo',gen_random_uuid());
+ perform public.terminar_ataque(lt,(a->>'id')::uuid,'[]'::jsonb);
+ if private.saldo(l)<>90 then raise exception 'Disparar descuenta presupuesto'; end if;
+ if (public.mis_disparos(lt)->>'restantes')::int<>0 then raise exception 'No cuenta 2 disparos'; end if;
+ begin perform public.iniciar_ataque(lt,'piedra','Tercero',gen_random_uuid()); exception when others then if position('2 disparos gratuitos' in sqlerrm)>0 then blocked:=true; else raise; end if; end;
+ if not blocked then raise exception 'Permite tercer disparo'; end if;
+ blocked:=false;
+ begin perform public.registrar_danos(lt,'[{"id":"test-free-damage","vida":0,"roto":true}]'::jsonb); exception when others then if position('No hay un ataque autorizado' in sqlerrm)>0 then blocked:=true; else raise; end if; end;
+ if not blocked then raise exception 'Permite daño sin ataque'; end if;
+ a:=public.iniciar_ataque(rt,'pelota','Derecha',gen_random_uuid());
+ perform public.terminar_ataque(rt,(a->>'id')::uuid,'[]'::jsonb);
+ if private.saldo(r)<>200 then raise exception 'Torres paga al disparar'; end if;
+ update public.disparos set created_at=(date_trunc('day',now() at time zone 'Europe/Madrid') at time zone 'Europe/Madrid')-interval '1 minute' where jugador_id=l;
+ if (public.mis_disparos(lt)->>'restantes')::int<>2 then raise exception 'No renueva al cambiar de día'; end if;
+end $$;
+rollback;
+select 'Correcto: 2 diarios, gratuitos, reintentos sin duplicar, tercer ataque rechazado, renovación y construcción de pago. Prueba revertida.' as resultado;
