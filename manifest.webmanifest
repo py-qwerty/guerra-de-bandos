@@ -1,2 +1,2 @@
-{ "name": "Guerra de Bandos", "short_name": "Bandos", "start_url": "./", "display": "standalone",
+{ "name": "Polarizador de Sociedades", "short_name": "Polarizador", "start_url": "./", "display": "standalone",
   "orientation": "landscape", "background_color": "#1b1b1f", "theme_color": "#c8102e" }

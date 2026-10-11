@@ -1,4 +1,4 @@
-# Guerra de Bandos
+# Polarizador de Sociedades
 
 Juego web móvil de catapultas políticas: **acampada en la Puerta del Sol** contra **las torres de oficinas**.
 Cada bloque es un argumento sobre el tema de la semana; cada disparo puede llevar una réplica.

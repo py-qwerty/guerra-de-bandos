@@ -119,3 +119,17 @@ body:has(#juego:not(.oculto)) .admin-access{display:none}
 @media(forced-colors:active){*{scrollbar-color:auto}}
 
 #acciones #btn-disparar{font-size:9px;line-height:1.5;min-width:0;white-space:normal}
+
+/* ===== Explicación de la vivienda en las franjas negras (modo vertical) ===== */
+#explicacion{display:none;position:absolute;inset:0;overflow:hidden;z-index:0;pointer-events:none}
+#phaser canvas{position:relative;z-index:1}
+@media (orientation:portrait){#explicacion{display:block}}
+#explicacion .cinta{display:flex;flex-direction:column;gap:18px;padding:0 14px;animation:bajar 70s linear infinite}
+@keyframes bajar{from{transform:translateY(-50%)}to{transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){#explicacion .cinta{animation-duration:400s}}
+.tarjeta-viv{background:#23232b;border:3px solid #000;box-shadow:4px 4px 0 #000;padding:10px;color:#f4f1ea;opacity:.9}
+.tarjeta-viv h4{margin:0 0 6px;font:9px/1.6 "Press Start 2P",monospace;color:#f2c230}
+.tarjeta-viv p{margin:0 0 6px;font-size:12px;line-height:1.4}
+.tarjeta-viv b.d{color:#ff6b7f}.tarjeta-viv b.o{color:#8fb3ff}
+.graf{margin:0}.graf svg{width:100%;max-width:320px;display:block;margin:0 auto;font-family:"Press Start 2P",monospace;image-rendering:pixelated}
+.graf figcaption{font-size:10px;text-align:center;opacity:.75;margin-top:2px}

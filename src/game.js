@@ -309,7 +309,7 @@ export class Campo extends Phaser.Scene {
   aplicarDano(d, enDirecto) {
     this.danosGuardados.set(d.pieza, d);
     const go = this.porId.get(d.pieza);
-    if (!go?.active) return;
+    if (!go?.active || go.getData('invulnerable')) return;
     if (d.roto && this.cuerpos.has(d.pieza)) { this.quitar(d.pieza, enDirecto); return; }
     if (d.roto) {
       if (enDirecto) this.escombros(go.x, go.y, go.getData('color'), go.getData('persona') ? 6 : 10);
@@ -394,6 +394,35 @@ export class Campo extends Phaser.Scene {
         img.destroy(); nombre.destroy();
       },
     });
+  }
+
+  // ===== Cada jugador registrado aparece como un personaje más de su bando, con su nombre =====
+  mostrarJugadores(jugadores, yoId) {
+    this.personajes ??= new Map();
+    const porBando = { izquierda: 0, derecha: 0 };
+    for (const j of jugadores || []) {
+      const i = porBando[j.bando]++;
+      if (this.personajes.has(j.id)) {
+        const go = this.personajes.get(j.id);
+        if (go.active) go.getData('etiqueta')?.setText((j.nombre || '').toUpperCase());
+        continue;
+      }
+      const izq = j.bando === 'izquierda';
+      const x = izq ? 280 + ((i * 47) % 340) : 1000 + ((i * 53) % 550);
+      const v = [...j.id].reduce((a, c) => (a + c.charCodeAt(0)) % 97, 0);
+      const tex = izq ? 'camp' + (v % 6) : 'curr' + (v % 4), texM = izq ? 'campM' + (v % 6) : 'currC' + (v % 4);
+      const go = this.matter.add.image(x, SUELO - 29, tex, null, {
+        // los jugadores son fijos e invulnerables: ni se rompen ni salen volando por los choques
+        isStatic: true, collisionFilter: filtro('FONDO'),
+      }).setScale(P * 1.1).setDepth(6.5);
+      go.setData({ vida: null, invulnerable: true, tipo: 'FONDO', color: izq ? 0xf1c27d : 0x2f3e52, persona: true, bando: j.bando, tex, texM, pixelable: false });
+      this.registrar?.(go, 'j' + j.id.slice(0, 30));
+      this.etiqueta(go, j.nombre || '¿?', j.id === yoId ? '#f2c230' : izq ? '#ffcdd2' : '#bbdefb');
+      (izq ? this.campistas : this.currantes).push(go);
+      this.personajes.set(j.id, go);
+      // pequeña entrada: salta al aparecer
+      go.setTint(0xffffff); this.bocadillo(go, j.id === yoId ? '¡ESTE SOY YO!' : '¡HE LLEGADO!', j.id === yoId ? '#f2c230' : '#ffffff');
+    }
   }
 
   bocadillo(p, texto, color = '#ffffff') {

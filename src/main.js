@@ -158,6 +158,7 @@ async function refrescar() {
   $('#hud-marcador').innerHTML = `<span class="izq">⛺ ${n('izquierda')}</span> · <span class="der">${n('derecha')} 🏢</span>`;
   pintarCreditos();
   if (estado.escena && estado.escena.modo === 'ver') estado.escena.sincronizar(bloques);
+  estado.escena?.mostrarJugadores?.(jugadores, estado.yo?.jugador_id);
   estado.disparosRestantes = tiros.restantes; pintarDisparos();
 }
 
@@ -313,10 +314,10 @@ async function terminarDisparo(est) {
 function compartirTexto(texto) {
   const url = location.href.split('?')[0];
   const msg = `${texto}\n${url}`;
-  if (navigator.share) navigator.share({ title: 'Guerra de Bandos', text: msg }).catch(() => {});
+  if (navigator.share) navigator.share({ title: 'Polarizador de Sociedades', text: msg }).catch(() => {});
   else navigator.clipboard?.writeText(msg).then(() => aviso('Copiado: pégalo en el grupo'));
 }
-$('#btn-compartir').onclick = () => compartirTexto(`⛺🆚🏢 ¿Acampada en Sol o currar en las torres? Elige bando en el Guerra de Bandos`);
+$('#btn-compartir').onclick = () => compartirTexto(`⛺🆚🏢 ¿Acampada en Sol o currar en las torres? Elige bando en el Polarizador de Sociedades`);
 
 // ---- Voces ----
 const pintaVoz = () => ($('#btn-voz').textContent = voces.activado ? '🔊' : '🔇');
