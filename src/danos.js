@@ -13,6 +13,7 @@ export function conectarDanos(partidaId, token, { alCambio, alAtaque, yo }) {
 
   let cola = Promise.resolve();
   return {
+    desconectar: () => sb.removeChannel(canal),
     vaciar: () => cola,
     esLider() {
       const ids = Object.keys(canal.presenceState() || {});

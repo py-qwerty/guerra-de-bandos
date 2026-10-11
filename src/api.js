@@ -55,8 +55,10 @@ export const api = {
       .eq('jugador_id', jugadorId).gte('created_at', hoy.toISOString());
     return count || 0;
   },
+  dejarEscuchar: canal => sb.removeChannel(canal),
   escuchar(partidaId, alCambiar) {
     return sb.channel('partida-' + partidaId)
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'partidas', filter: `id=eq.${partidaId}` }, alCambiar)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'bloques', filter: `partida_id=eq.${partidaId}` }, alCambiar)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'disparos', filter: `partida_id=eq.${partidaId}` }, alCambiar)
       .subscribe();

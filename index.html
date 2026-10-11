@@ -17,7 +17,7 @@
   <section id="lobby" class="pantalla">
     <h1>GUERRA<br/>DE BANDOS</h1>
     <p class="sub">¿Dónde pasas la semana? Elige bien: no hay vuelta atrás (casi).</p>
-    <input id="in-nombre" class="nombre" maxlength="24" placeholder="Tu nombre (opcional)" />
+    <input id="in-nombre" class="nombre" maxlength="24" placeholder="Tu nombre (obligatorio)" />
     <div class="opciones">
       <button class="opcion izq" data-bando="izquierda">
         <img alt="" /><span class="velo"></span>
@@ -63,7 +63,7 @@
     <section id="admin-controls" class="oculto" aria-label="Controles de partida">
       <div class="admin-board"><span>PARTIDA GENERAL</span><h3 id="admin-name">España</h3><p id="admin-state" role="status"></p><p id="admin-date" class="meta"></p></div>
       <div class="admin-actions"><button id="admin-start">Iniciar partida</button><button id="admin-end" class="sec">Terminar partida</button></div>
-      <div id="admin-confirm" class="oculto"><p>¿Terminar para todos los jugadores? Se conservará el tablero.</p><div class="admin-actions"><button id="admin-cancel" class="sec">Seguir jugando</button><button id="admin-confirm-end" class="danger">Sí, terminar partida</button></div></div>
+      <div id="admin-confirm" class="oculto"><p>¿Terminar para todos los jugadores? Volverán a elegir nombre y bando. Se conservará el tablero.</p><div class="admin-actions"><button id="admin-cancel" class="sec">Seguir jugando</button><button id="admin-confirm-end" class="danger">Sí, terminar partida</button></div></div>
       <section class="admin-player-section" aria-labelledby="admin-shots-title">
         <h3 id="admin-shots-title">Disparos de todos</h3>
         <p>Devuelve 2 disparos gratuitos disponibles a cada jugador de esta partida. Se conserva el historial y el presupuesto.</p>
@@ -108,6 +108,6 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-  <script type="module" src="src/main.js"></script>
+  <script type="module" src="src/main.js?v=20261012-lobby"></script>
 </body>
 </html>

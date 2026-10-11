@@ -1,9 +1,10 @@
 import { iniciarAdmin } from './admin.js';
-import { api } from './api.js';
+import { api } from './api.js?v=20261012-lobby';
 import { fotoDe } from './imagenes.js';
 import { voces } from './voces.js';
-import { crearJuego, MUNICION, MUNICIONES, PIEZAS, PRESUPUESTO } from './game.js';
-import { $, aviso, modal, esc } from './ui.js';
+import { crearJuego, MUNICION, MUNICIONES, PIEZAS, PRESUPUESTO } from './game.js?v=20261012-lobby';
+import { $, aviso, modal, cerrarModal, esc } from './ui.js?v=20261012-lobby';
+import { partidaCerrada } from './partida.js';
 
 const estado = { partida: null, yo: null, jugadores: [], bloques: [], escena: null, disparosHoy: 0 };
 
@@ -11,10 +12,6 @@ const estado = { partida: null, yo: null, jugadores: [], bloques: [], escena: nu
 const err = (m) => ($('#lobby-error').textContent = m || '');
 
 async function arrancar() {
-  try {
-    const s = await api.quienSoy();       // te reconocemos por tu IP
-    if (s) return entrar(s);
-  } catch (e) { err('No conecta con el servidor: ' + e.message); }
   for (const bando of ['izquierda', 'derecha']) {
     fotoDe(bando).then((f) => {
       if (!f) return;
@@ -28,7 +25,16 @@ async function arrancar() {
 
 document.querySelectorAll('.opcion').forEach((b) => (b.onclick = async () => {
   err();
-  try { entrar(await api.entrar(b.dataset.bando, $('#in-nombre').value.trim())); }
+  const nombre = $('#in-nombre').value.trim();
+  if (!nombre) { err('Pon tu nombre antes de elegir bando'); $('#in-nombre').focus(); return; }
+  try {
+    const partida = await api.partida('general');
+    if (!partida || !partida.activa) { err('La partida ha terminado. Espera a que el administrador la inicie.'); return; }
+    const sesion = await api.entrar(b.dataset.bando, nombre);
+    await api.renombrar(sesion.token, nombre);
+    sesion.nombre = nombre;
+    await entrar(sesion);
+  }
   catch (e) { err(e.message); }
 }));
 
@@ -47,7 +53,10 @@ function pixelar(img) {
 }
 
 iniciarAdmin(partida => {
-  if (estado.partida?.id === partida.id) { estado.partida = partida; pintarEstado(); refrescar().catch(e => aviso(e.message)); }
+  if (estado.partida?.id === partida.id) {
+    if (partidaCerrada(estado.partida, partida)) return volverEntrada();
+    estado.partida = partida; pintarEstado(); refrescar().catch(e => aviso(e.message));
+  }
 }, async (tipo, bando, partidaId) => {
   if (estado.escena) return estado.escena.slotPara(tipo, bando);
   // La administración también puede construir desde la entrada al juego.
@@ -81,6 +90,7 @@ function puedeJugar() {
 
 // ================= JUEGO =================
 async function entrar(s) {
+  if (!s.partida?.activa) return volverEntrada();
   estado.yo = s;
   estado.partida = s.partida;
   pintarEstado();
@@ -94,24 +104,30 @@ async function entrar(s) {
 
   $('#btn-disparar').textContent = estado.yo.bando === 'izquierda' ? '🪨 Pedradas' : '🔫 Fuego';
   try { await document.fonts.load('10px "Press Start 2P"'); } catch {}
-  crearJuego({
+  estado.juego = crearJuego({
     bando: estado.yo.bando,
     partidaId: estado.partida.id, token: estado.yo.token, nombre: estado.yo.nombre, jugadorId: estado.yo.jugador_id,
     aviso,
-    alListo: async (escena) => { estado.escena = escena; await refrescar(); },
+    alListo: async (escena) => { if (estado.yo !== s) return; estado.escena = escena; await refrescar(); },
     alTocarBloque: verBloque,
     alTerminarDisparo: terminarDisparo,
   });
 
   estado.poll = setInterval(() => refrescar().catch(() => {}), 10000);
-  api.escuchar(estado.partida.id, () => { clearTimeout(estado.t); estado.t = setTimeout(refrescar, 400); });
+  estado.canal = api.escuchar(estado.partida.id, () => { clearTimeout(estado.t); estado.t = setTimeout(() => refrescar().catch(() => {}), 400); });
 }
 
 async function refrescar() {
-  const [tema, bloques, jugadores, pres, partida, tiros] = await Promise.all([
+  const sesion = estado.yo, anterior = estado.partida;
+  if (!sesion || !anterior) return;
+  const partida = await api.partida(anterior.codigo);
+  if (estado.yo !== sesion) return;
+  if (partidaCerrada(anterior, partida)) return volverEntrada();
+  const [tema, bloques, jugadores, pres, tiros] = await Promise.all([
     api.tema(estado.partida.id), api.bloques(estado.partida.id),
-    api.jugadores(estado.partida.id), api.presupuesto(estado.yo.token), api.partida(estado.partida.codigo), api.misDisparos(estado.yo.token),
+    api.jugadores(estado.partida.id), api.presupuesto(estado.yo.token), api.misDisparos(estado.yo.token),
   ]);
+  if (estado.yo !== sesion) return;
   if (partida) { estado.partida = partida; pintarEstado(); }
   estado.bloques = bloques; estado.jugadores = jugadores;
   if (pres) { estado.creditos = pres.restante; estado.presupuesto = pres.presupuesto; }
@@ -123,13 +139,34 @@ async function refrescar() {
   estado.disparosRestantes = tiros.restantes; pintarDisparos();
 }
 
+function volverEntrada() {
+  clearInterval(estado.poll); clearTimeout(estado.t);
+  if (estado.canal) api.dejarEscuchar(estado.canal);
+  estado.canal = null;
+  cerrarModal();
+  estado.escena?.danos?.desconectar?.();
+  estado.juego?.destroy(true);
+  Object.assign(estado, { partida: null, yo: null, escena: null, juego: null, jugadores: [], bloques: [], disparo: null, solicitudAtaque: null, reservandoAtaque: false });
+  $('#juego').classList.add('oculto');
+  $('#lobby').classList.remove('oculto');
+  $('#in-nombre').value = '';
+  err('Partida terminada. Elige tu nombre y bando cuando se inicie la siguiente.');
+  if (!$('#admin').open) $('#in-nombre').focus();
+}
+// Una pestaña suspendida comprueba el cierre al volver al primer plano.
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && estado.yo) refrescar().catch(() => {});
+});
+
 function pintarDisparos() {
+  if (!estado.yo) return;
   const etiqueta = estado.yo.bando === 'izquierda' ? '🪨 Pedradas' : '🔫 Fuego';
   $('#btn-disparar').textContent = `${etiqueta} (${estado.disparosRestantes ?? 2}/2)`;
   $('#btn-disparar').disabled = estado.partida?.activa === false || estado.disparosRestantes === 0 || !!estado.reservandoAtaque;
 }
 
 function pintarCreditos() {
+  if (!estado.yo) return;
   const max = estado.presupuesto ?? PRESUPUESTO[estado.yo.bando];
   $('#hud-municion').textContent = `💰 ${Math.max(0, estado.creditos ?? max)}/${max}`;
 }
@@ -176,7 +213,7 @@ async function construir() {
       };
     },
   });
-  if (!datos) return;
+  if (!datos || !estado.yo) return;
   try {
     const p = PIEZAS[datos.tipo];
     const pos = estado.escena.slotPara(datos.tipo, estado.yo.bando);
@@ -219,12 +256,14 @@ $('#btn-disparar').onclick = async () => {
       };
     },
   });
-  if (!r) return;
+  if (!r || !estado.yo) return;
   estado.reservandoAtaque = true; pintarDisparos();
   const key = JSON.stringify(r);
   if (estado.solicitudAtaque?.key !== key) estado.solicitudAtaque = { key, id: crypto.randomUUID() };
   try {
+    const sesionAtaque = estado.yo;
     const autorizado = await api.iniciarAtaque(estado.yo.token, r.municion, r.replica, estado.solicitudAtaque.id);
+    if (estado.yo !== sesionAtaque) return;
     estado.disparosRestantes = autorizado.restantes;
     estado.solicitudAtaque = null;
     if (autorizado.finalizado) { aviso('Este ataque ya se completó.'); return; }
@@ -235,6 +274,7 @@ $('#btn-disparar').onclick = async () => {
 };
 
 async function terminarDisparo(est) {
+  if (!estado.yo || !estado.disparo) return;
   const { municion, replica, id } = estado.disparo || {};
   try {
     const r = await api.terminarAtaque(estado.yo.token, id, est);
@@ -253,7 +293,7 @@ function compartirTexto(texto) {
   if (navigator.share) navigator.share({ title: 'Guerra de Bandos', text: msg }).catch(() => {});
   else navigator.clipboard?.writeText(msg).then(() => aviso('Copiado: pégalo en el grupo'));
 }
-$('#btn-compartir').onclick = () => compartirTexto(`⛺🆚🏢 ¿Acampada en Sol o currar en las torres? Elige bando en Guerra de Bandos`);
+$('#btn-compartir').onclick = () => compartirTexto(`⛺🆚🏢 ¿Acampada en Sol o currar en las torres? Elige bando en el Guerra de Bandos`);
 
 // ---- Voces ----
 const pintaVoz = () => ($('#btn-voz').textContent = voces.activado ? '🔊' : '🔇');

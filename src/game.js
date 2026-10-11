@@ -5,7 +5,7 @@ import {
 } from './sprites.js';
 import { MEMES_SOL, MEMES_TORRES, AY_SOL, AY_TORRES, GRITO_SOL, GRITO_TORRES, NOMBRES_SOL, NOMBRES_TORRES } from './memes.js';
 import { hablar, voces } from './voces.js';
-import { conectarDanos } from './danos.js';
+import { conectarDanos } from './danos.js?v=20261012-lobby';
 
 const Phaser = window.Phaser;
 const M = () => Phaser.Physics.Matter.Matter;
