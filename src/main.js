@@ -4,14 +4,28 @@ import { fotoDe } from './imagenes.js';
 import { voces } from './voces.js';
 import { crearJuego, MUNICION, MUNICIONES, PIEZAS, PRESUPUESTO } from './game.js?v=20261012-lobby';
 import { $, aviso, modal, cerrarModal, esc } from './ui.js?v=20261012-lobby';
-import { partidaCerrada } from './partida.js?v=20261012-entry-fix';
+import { partidaCerrada, puedeReanudar } from './partida.js?v=20261012-resume';
 
 const estado = { partida: null, yo: null, jugadores: [], bloques: [], escena: null, disparosHoy: 0 };
 
 // ================= LOBBY =================
 const err = (m) => ($('#lobby-error').textContent = m || '');
+// Solo se recuerda la ronda elegida; nunca el token del jugador o de administración.
+const claveRonda = 'gdb_ronda_elegida';
+function leerRonda() { try { return JSON.parse(localStorage.getItem(claveRonda)); } catch { return null; } }
+function recordarRonda(ronda) { try { localStorage.setItem(claveRonda, JSON.stringify(ronda)); } catch {} }
+
 
 async function arrancar() {
+  try {
+    const jugador = await api.quienSoy();
+    if (jugador) {
+      const partida = await api.partida(jugador.partida.codigo);
+      if (puedeReanudar(leerRonda(), partida, jugador.jugador_id)) return entrar(jugador);
+      recordarRonda({ cerrada: true });
+    }
+  } catch (e) { err('No conecta con el servidor: ' + e.message); }
+
   for (const bando of ['izquierda', 'derecha']) {
     fotoDe(bando).then((f) => {
       if (!f) return;
@@ -98,6 +112,7 @@ async function entrar(s) {
   const partida = await api.partida(s.partida.codigo);
   if (!partida || partida.activa === false) return volverEntrada();
   s.partida = partida;
+  recordarRonda({ id: partida.id, iniciada_at: partida.iniciada_at, jugador_id: s.jugador_id });
   estado.yo = s;
   estado.partida = s.partida;
   pintarEstado();
@@ -147,6 +162,7 @@ async function refrescar() {
 }
 
 function volverEntrada() {
+  recordarRonda({ cerrada: true });
   clearInterval(estado.poll); clearTimeout(estado.t);
   if (estado.canal) api.dejarEscuchar(estado.canal);
   estado.canal = null;
