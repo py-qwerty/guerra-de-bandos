@@ -33,7 +33,7 @@ Los tokens de `src/style.css` son la fuente de verdad. izquierda → --izq; dere
 Sistema para lectura y formularios; Press Start 2P para botones y marcadores del juego. Español de España; fechas en Europe/Madrid.
 
 ## Layout
-Diálogo de 600 píxeles como máximo con desplazamiento propio. En móvil mantiene 12 píxeles de margen y adapta los botones. Su cabecera conserva acceso al cierre. En la entrada, Administrar partida está arriba a la derecha; jugando tiene una fila propia en la barra inferior para permanecer visible y accesible.
+Diálogo de 600 píxeles como máximo con desplazamiento propio. En móvil mantiene 12 píxeles de margen y adapta los botones. Su cabecera conserva acceso al cierre. En la entrada, Admin está arriba a la derecha; jugando ocupa 62 píxeles en la misma fila que los controles. Conserva un área táctil de 44 píxeles de alto. En horizontal se compactan las barras y se respetan las zonas seguras del móvil. Phaser centra el campo completo sin un segundo centrado CSS. Los diálogos cortos en altura tienen desplazamiento propio.
 
 ## Elevation & Depth
 Fondo modal oscuro; superficies planas. El tablero de estado se distingue mediante una banda amarilla.

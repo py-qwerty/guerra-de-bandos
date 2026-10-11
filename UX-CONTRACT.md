@@ -36,3 +36,6 @@ Excepción administrativa aprobada por el usuario: Restablecer disparos de todos
 
 
 Proyectiles: se arman al cruzar al campo rival y conservan el bando del lanzador. Una bomba no detona en el campo propio ni por un contacto temprano con el suelo. La explosión aplica impulso, pérdida de píxeles y daño solo a objetivos rivales dentro de su radio. Las piezas aliadas quedan excluidas, incluso si están junto a un objetivo enemigo. Regresiones verificadas en tests/projectiles.test.mjs.
+
+
+Vista móvil: Admin abre el mismo panel desde un control compacto con nombre accesible Administrar partida. La barra inferior permanece en una fila, con objetivos táctiles de al menos 44 píxeles de alto. La vista horizontal conserva ambos bandos completos; las barras respetan las zonas seguras y los diálogos permiten desplazamiento en pantallas de poca altura.
