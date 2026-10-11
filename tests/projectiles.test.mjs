@@ -8,7 +8,7 @@ const phaser={Scene:class{},Physics:{Matter:{Matter:{Sleeping:{set(){}}}}},Math:
 const context=vm.createContext({window:{Phaser:phaser},Math,Map,Set,Promise});
 const module=new vm.SourceTextModule(fs.readFileSync(new URL('../src/game.js',import.meta.url),'utf8'),{context});
 const exports={'./sprites.js':sprites,'./memes.js':memes,'./voces.js':{hablar(){},voces:{}},'./danos.js':{conectarDanos(){}}};
-await module.link(spec=>{const e=exports[spec];return new vm.SyntheticModule(Object.keys(e),function(){for(const[k,v]of Object.entries(e))this.setExport(k,v);},{context});});await module.evaluate();
+await module.link(spec=>{const e=exports[spec.split('?')[0]];return new vm.SyntheticModule(Object.keys(e),function(){for(const[k,v]of Object.entries(e))this.setExport(k,v);},{context});});await module.evaluate();
 for(const [side,ids]of Object.entries(sprites.MUNICION))for(const id of ids)test(`${side}: ${id} genera un proyectil gratuito con trayectoria válida`,()=>{
  const scene=new module.namespace.Campo();scene.init({bando:side});scene.campistas=[];scene.currantes=[];
  const delays=[],velocities=[];
