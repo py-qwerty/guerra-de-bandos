@@ -5,16 +5,12 @@ Cada bloque es un argumento sobre el tema de la semana; cada disparo puede lleva
 
 Web 100 % estática (sin compilar): Phaser y Supabase se cargan desde CDN, lista para **GitHub Pages**.
 
-## Publicar en GitHub Pages
-```
-cd ~/Documents/guerra-de-bandos
-git init && git add . && git commit -m "Guerra de Bandos"
-git branch -M main
-git remote add origin https://github.com/TU_USUARIO/guerra-de-bandos.git
-git push -u origin main
-```
-En GitHub: Settings → Pages → Source: *Deploy from a branch* → `main` / `(root)`.
-Quedará en `https://TU_USUARIO.github.io/guerra-de-bandos/`.
+## Web publicada
+
+- Juego: https://py-qwerty.github.io/guerra-de-bandos/
+- Repositorio: https://github.com/py-qwerty/guerra-de-bandos
+
+GitHub Pages publica automáticamente los cambios subidos a `main`, la rama principal. El juego es estático y utiliza el servidor Supabase ya configurado. Los archivos `.env`, las dependencias instaladas y los archivos locales de diagnóstico están excluidos del repositorio.
 
 ## Probar en local
 `npx serve .` (o `python3 -m http.server`) y abre la dirección desde el móvil en la misma wifi.
