@@ -9,6 +9,7 @@ const flush=()=>new Promise(resolve=>setImmediate(resolve));
 test('Detecta cierre, eliminación y reinicio entre consultas, conservando una partida vigente',()=>{
  const p={id:'p',activa:true,iniciada_at:'uno'};
  assert.equal(partidaCerrada(p,{...p}),false);
+ assert.equal(partidaCerrada({id:'p',codigo:'general',nombre:'España'},p),false);
  assert.equal(partidaCerrada(p,{...p,activa:false}),true);
  assert.equal(partidaCerrada(p,null),true);
  assert.equal(partidaCerrada(p,{...p,iniciada_at:'dos'}),true);
@@ -18,7 +19,7 @@ async function cliente(){
  d.fonts={load:async()=>{}};
  let partida={id:'p',codigo:'general',activa:true,iniciada_at:'uno'},cambio,escuchar,destruido=0,dejado=0,cancelado=0;
  const timers=new Set();
- const api={quienSoy:()=>{throw Error('No debe saltarse la entrada');},entrar:async(b,n)=>({partida:{...partida},token:'t',bando:b,nombre:n,jugador_id:'j'}),renombrar:async()=>{},partida:async()=>({...partida}),jugadores:async()=>[],bloques:async()=>[],tema:async()=>null,presupuesto:async()=>({restante:100,presupuesto:100}),misDisparos:async()=>({restantes:2}),escuchar:(id,fn)=>{escuchar=fn;return 'canal';},dejarEscuchar:()=>dejado++};
+ const api={quienSoy:()=>{throw Error('No debe saltarse la entrada');},entrar:async(b,n)=>({partida:{id:partida.id,codigo:partida.codigo,nombre:'España'},token:'t',bando:b,nombre:n,jugador_id:'j'}),renombrar:async()=>{},partida:async()=>({...partida}),jugadores:async()=>[],bloques:async()=>[],tema:async()=>null,presupuesto:async()=>({restante:100,presupuesto:100}),misDisparos:async()=>({restantes:2}),escuchar:(id,fn)=>{escuchar=fn;return 'canal';},dejarEscuchar:()=>dejado++};
  const context=vm.createContext({document:d,window:dom.window,setInterval:fn=>{timers.add(fn);return fn;},clearInterval:fn=>timers.delete(fn),setTimeout,clearTimeout,crypto:globalThis.crypto,console});
  const mods={'./admin.js':{iniciarAdmin:fn=>cambio=fn},'./api.js':{api},'./imagenes.js':{fotoDe:async()=>null},'./voces.js':{voces:{activado:false}},'./game.js':{crearJuego:opts=>{const scene={modo:'ver',sincronizar(){},mostrarJugadores(){}};queueMicrotask(()=>opts.alListo(scene));return {destroy:()=>destruido++};},MUNICION:{},MUNICIONES:{},PIEZAS:{},PRESUPUESTO:{izquierda:100,derecha:200}},'./ui.js':{$:s=>d.querySelector(s),aviso:()=>{},modal:async()=>null,cerrarModal:()=>cancelado++,esc:s=>s},'./partida.js':{partidaCerrada}};
  const mod=new vm.SourceTextModule(fs.readFileSync(new URL('../src/main.js',import.meta.url),'utf8')+'\nexport {refrescar};',{context});

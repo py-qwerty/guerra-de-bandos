@@ -4,7 +4,7 @@ import { fotoDe } from './imagenes.js';
 import { voces } from './voces.js';
 import { crearJuego, MUNICION, MUNICIONES, PIEZAS, PRESUPUESTO } from './game.js?v=20261012-lobby';
 import { $, aviso, modal, cerrarModal, esc } from './ui.js?v=20261012-lobby';
-import { partidaCerrada } from './partida.js';
+import { partidaCerrada } from './partida.js?v=20261012-entry-fix';
 
 const estado = { partida: null, yo: null, jugadores: [], bloques: [], escena: null, disparosHoy: 0 };
 
@@ -69,8 +69,11 @@ iniciarAdmin(partida => {
   jugador: () => estado.yo,
   ocupado: () => estado.escena?.modo !== 'ver',
   cambiar: async sesion => {
+    const partida = await api.partida(sesion.partida.codigo);
+    if (partidaCerrada(estado.partida, partida)) return volverEntrada();
+    sesion.partida = partida;
     estado.yo = sesion;
-    estado.partida = sesion.partida;
+    estado.partida = partida;
     if (estado.escena) estado.escena.ctx.bando = sesion.bando;
     estado.disparo = null;
     $('#btn-disparar').textContent = sesion.bando === 'izquierda' ? '🪨 Pedradas' : '🔫 Fuego';
@@ -90,7 +93,11 @@ function puedeJugar() {
 
 // ================= JUEGO =================
 async function entrar(s) {
-  if (!s.partida?.activa) return volverEntrada();
+  // La respuesta de entrar solo incluye id, codigo y nombre de la partida.
+  // El estado y las fechas se leen de la partida completa, nunca de esa referencia.
+  const partida = await api.partida(s.partida.codigo);
+  if (!partida || partida.activa === false) return volverEntrada();
+  s.partida = partida;
   estado.yo = s;
   estado.partida = s.partida;
   pintarEstado();
