@@ -31,6 +31,13 @@ function buffer(url) {
 // Canales: el ambiente (memes) habla de uno en uno; la acción (golpes, gritos) hasta 2 a la vez
 const LIMITE = { ambiente: 1, accion: 2, tutorial: 1 };
 const ocupados = { ambiente: 0, accion: 0, tutorial: 0 };
+let npcCallados = false;
+const sonandoNPC = new Set();
+/** Mientras habla el tutorial, los NPCs se callan (y se corta lo que estuvieran diciendo). */
+export function callarNPCs(si) {
+  npcCallados = si;
+  if (si) for (const s of sonandoNPC) { try { s.stop(); } catch {} }
+}
 
 export const voces = {
   get activado() { return activado; },
@@ -43,6 +50,7 @@ export const voces = {
 /** Dice la frase con una de sus dos voces al azar. */
 export async function hablar(texto, { volumen = 0.8, bando, canal = 'accion' } = {}) {
   if (!activado || !ctx || ctx.state !== 'running' || ocupados[canal] >= LIMITE[canal]) return;
+  if (npcCallados && canal !== 'tutorial') return;
   await carga;
   const lista = (bando && mapa?.[bando]?.[texto]) || mapa?.izquierda?.[texto] || mapa?.derecha?.[texto] || mapa?.tutorial?.[texto];
   if (!lista?.length) { console.warn('[voces] sin audio para:', texto); return; }
@@ -55,7 +63,8 @@ export async function hablar(texto, { volumen = 0.8, bando, canal = 'accion' } =
     const src = ctx.createBufferSource(); src.buffer = buf;
     const g = ctx.createGain(); g.gain.value = volumen;
     src.connect(g).connect(ctx.destination);
-    src.onended = liberar;
+    if (canal !== 'tutorial') { sonandoNPC.add(src); }
+    src.onended = () => { sonandoNPC.delete(src); liberar(); };
     setTimeout(liberar, buf.duration * 1000 + 500); // por si onended no llega
     src.start();
     return buf.duration; // segundos, para encadenar frases

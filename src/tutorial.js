@@ -1,6 +1,6 @@
 // "Tutorial" a insultos: si alguien toca la pantalla sin sentido o no pulsa Construir/Atacar
 // en un buen rato, una voz le llama jodido inútil y le explica cómo se juega.
-import { hablar } from './voces.js';
+import { hablar, callarNPCs } from './voces.js';
 import { $, aviso } from './ui.js';
 
 const INSULTO = 'Jodido inútil.';
@@ -14,12 +14,13 @@ const EXPLICACION = [
   'Lo que rompes se queda roto para todos, así que rompe algo, coño, que para eso estás aquí.',
 ];
 
-const TOQUES_SEGUIDOS = 4;      // toques en la pantalla...
-const VENTANA_MS = 5000;        // ...en estos milisegundos = está tocando por tocar
-const INACTIVO_MS = 120000;     // 2 minutos sin construir ni atacar
-const DESCANSO_MS = 45000;      // entre bronca y bronca
+const TOQUES_SEGUIDOS = 3;      // toques en la pantalla...
+const VENTANA_MS = 4000;        // ...en estos milisegundos = está tocando por tocar
+const PRIMERA_MS = 20000;       // la primera vez: 20 s sin construir ni atacar
+const INACTIVO_MS = 60000;      // después: 1 minuto sin tocar nada -> el tutorial empieza de nuevo
+const DESCANSO_MS = 25000;      // entre bronca y bronca
 
-let ultimaAccion = Date.now(), ultimaBronca = 0, toques = [], paso = 0, hablando = false;
+let ultimaAccion = Date.now(), ultimoToque = Date.now(), ultimaBronca = 0, toques = [], paso = 0, hablando = false, primeraHecha = false;
 const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function decir(texto) {
@@ -32,23 +33,32 @@ async function decir(texto) {
 async function bronca(motivo) {
   const ahora = Date.now();
   if (hablando || ahora - ultimaBronca < DESCANSO_MS || $('#juego')?.classList.contains('oculto')) return;
-  hablando = true; ultimaBronca = ahora;
+  hablando = true; ultimaBronca = ahora; primeraHecha = true;
+  callarNPCs(true);
   try {
     await decir(INSULTO);
     await decir(motivo === 'toques' ? TOQUES[Math.floor(Math.random() * TOQUES.length)] : QUIETO);
     // dos frases de explicación, rotando para que cada vez aprenda algo nuevo
     for (let i = 0; i < 2; i++) await decir(EXPLICACION[paso++ % EXPLICACION.length]);
-  } finally { hablando = false; ultimaAccion = Date.now(); }
+  } finally { hablando = false; callarNPCs(false); ultimaAccion = ultimoToque = Date.now(); }
 }
 
 export function iniciarTutorialInsultos() {
   // pulsar Construir, Atacar o cualquier botón de juego cuenta como "hacer algo"
   document.querySelector('#acciones')?.addEventListener('click', () => { ultimaAccion = Date.now(); toques = []; }, true);
   document.querySelector('#modal')?.addEventListener('click', () => { ultimaAccion = Date.now(); }, true);
+  document.addEventListener('pointerdown', () => { ultimoToque = Date.now(); }, true);
   document.querySelector('#phaser')?.addEventListener('pointerdown', () => {
     const t = Date.now();
     toques = toques.filter((x) => t - x < VENTANA_MS); toques.push(t);
     if (toques.length >= TOQUES_SEGUIDOS) { toques = []; bronca('toques'); }
   }, true);
-  setInterval(() => { if (Date.now() - ultimaAccion > INACTIVO_MS) bronca('quieto'); }, 15000);
+  setInterval(() => {
+    const ahora = Date.now();
+    // los contadores empiezan al entrar en la partida, no en la pantalla de inicio
+    if ($('#juego')?.classList.contains('oculto')) { ultimaAccion = ultimoToque = ahora; return; }
+    if (!primeraHecha) { if (ahora - ultimaAccion > PRIMERA_MS) bronca('quieto'); return; }
+    // más de 1 minuto sin interactuar: el tutorial vuelve a empezar desde el principio
+    if (ahora - ultimoToque > INACTIVO_MS) { paso = 0; bronca('quieto'); }
+  }, 2000);
 }
