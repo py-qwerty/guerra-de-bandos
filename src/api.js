@@ -46,7 +46,11 @@ export const api = {
     return data || [];
   },
   async bloques(partidaId) {
-    const { data } = await sb.from('bloques').select('*').eq('partida_id', partidaId).eq('en_pie', true).order('created_at');
+    // solo lo construido en la partida actual (lo de partidas anteriores no cuenta)
+    const { data: p } = await sb.from('partidas').select('iniciada_at').eq('id', partidaId).maybeSingle();
+    let q = sb.from('bloques').select('*').eq('partida_id', partidaId).eq('en_pie', true);
+    if (p?.iniciada_at) q = q.gte('created_at', p.iniciada_at);
+    const { data } = await q.order('created_at');
     return data || [];
   },
   async disparosHoy(jugadorId) {

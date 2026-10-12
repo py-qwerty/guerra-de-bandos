@@ -21,7 +21,11 @@ export function conectarDanos(partidaId, token, { alCambio, alAtaque, yo }) {
       return [...ids].sort()[0] === yo;
     },
     async cargar() {
-      const { data, error } = await sb.from('danos').select('pieza,vida,roto,agujeros').eq('partida_id', partidaId);
+      // solo los daños de la partida actual: al iniciar una nueva, el tablero sale entero
+      const { data: p } = await sb.from('partidas').select('iniciada_at').eq('id', partidaId).maybeSingle();
+      let q = sb.from('danos').select('pieza,vida,roto,agujeros').eq('partida_id', partidaId);
+      if (p?.iniciada_at) q = q.gte('updated_at', p.iniciada_at);
+      const { data, error } = await q;
       if (error) console.warn('[daños]', error.message);
       return data || [];
     },
