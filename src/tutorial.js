@@ -1,7 +1,7 @@
 // "Tutorial" a insultos: si alguien toca la pantalla sin sentido o no pulsa Construir/Atacar
 // en un buen rato, una voz le llama jodido inútil y le explica cómo se juega.
-import { hablar, callarNPCs } from './voces.js?v=20261012-refresh1';
-import { $, aviso } from './ui.js?v=20261012-refresh1';
+import { hablar, callarNPCs } from './voces.js?v=20261012-audio2';
+import { $, aviso } from './ui.js?v=20261012-audio2';
 
 const INSULTO = 'Jodido inútil.';
 const TOQUES = ['Jodido inútil, eso es el fondo, no un botón. Los botones están abajo y no muerden.',

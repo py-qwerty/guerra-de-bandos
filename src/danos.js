@@ -1,7 +1,7 @@
 // Daños persistentes y en directo: vida, piezas rotas y píxeles arrancados se guardan en la tabla
 // "danos" y llegan al instante a todos los que tengan el juego abierto. Los ataques se retransmiten
 // para que el resto vea volar las piedras y los tiros a la vez.
-import { sb } from './api.js?v=20261012-refresh1';
+import { sb } from './api.js?v=20261012-audio2';
 
 export function conectarDanos(partidaId, token, { alCambio, alAtaque, yo }) {
   // presence: entre los que tienen el juego abierto, uno solo (el "líder") calcula el daño del tiroteo de ambiente

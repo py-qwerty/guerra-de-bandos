@@ -2,10 +2,10 @@
 import {
   P, crearTextura, CAMPISTA, CAMPISTA_MANOS, CURRANTE, CURRANTE_CAFE, TIENDA, OSO, BIDON, BIDON2,
   PALOMA, PALOMA2, NUBE, HONDA, texSegmentoTorre, texCorreos, texReloj, texBloque, MUNICIONES, MUNICION, PIEZAS, PRESUPUESTO,
-} from './sprites.js?v=20261012-refresh1';
-import { MEMES_SOL, MEMES_TORRES, AY_SOL, AY_TORRES, GRITO_SOL, GRITO_TORRES, NOMBRES_SOL, NOMBRES_TORRES } from './memes.js?v=20261012-refresh1';
-import { hablar, voces } from './voces.js?v=20261012-refresh1';
-import { conectarDanos } from './danos.js?v=20261012-refresh1';
+} from './sprites.js?v=20261012-audio2';
+import { MEMES_SOL, MEMES_TORRES, AY_SOL, AY_TORRES, GRITO_SOL, GRITO_TORRES, NOMBRES_SOL, NOMBRES_TORRES } from './memes.js?v=20261012-audio2';
+import { hablar, voces } from './voces.js?v=20261012-audio2';
+import { conectarDanos } from './danos.js?v=20261012-audio2';
 
 const Phaser = window.Phaser;
 const M = () => Phaser.Physics.Matter.Matter;

@@ -1,12 +1,12 @@
-import { iniciarAdmin } from './admin.js?v=20261012-refresh1';
-import { api } from './api.js?v=20261012-refresh1';
-import { fotoDe } from './imagenes.js?v=20261012-refresh1';
-import { voces } from './voces.js?v=20261012-refresh1';
-import { iniciarTutorialInsultos } from './tutorial.js?v=20261012-refresh1';
-import { iniciarVozEntrada } from './entrada.js?v=20261012-refresh1';
-import { crearJuego, MUNICION, MUNICIONES, PIEZAS, PRESUPUESTO } from './game.js?v=20261012-refresh1';
-import { $, aviso, modal, cerrarModal, esc } from './ui.js?v=20261012-refresh1';
-import { partidaCerrada, puedeReanudar } from './partida.js?v=20261012-refresh1';
+import { iniciarAdmin } from './admin.js?v=20261012-audio2';
+import { api } from './api.js?v=20261012-audio2';
+import { fotoDe } from './imagenes.js?v=20261012-audio2';
+import { voces } from './voces.js?v=20261012-audio2';
+import { iniciarTutorialInsultos } from './tutorial.js?v=20261012-audio2';
+import { iniciarVozEntrada } from './entrada.js?v=20261012-audio2';
+import { crearJuego, MUNICION, MUNICIONES, PIEZAS, PRESUPUESTO } from './game.js?v=20261012-audio2';
+import { $, aviso, modal, cerrarModal, esc } from './ui.js?v=20261012-audio2';
+import { partidaCerrada, puedeReanudar } from './partida.js?v=20261012-audio2';
 
 const estado = { partida: null, yo: null, jugadores: [], bloques: [], escena: null, disparosHoy: 0 };
 
