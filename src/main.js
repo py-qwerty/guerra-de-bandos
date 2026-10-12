@@ -2,6 +2,7 @@ import { iniciarAdmin } from './admin.js';
 import { api } from './api.js?v=20261012-lobby';
 import { fotoDe } from './imagenes.js';
 import { voces } from './voces.js';
+import { iniciarTutorialInsultos } from './tutorial.js';
 import { crearJuego, MUNICION, MUNICIONES, PIEZAS, PRESUPUESTO } from './game.js?v=20261012-lobby';
 import { $, aviso, modal, cerrarModal, esc } from './ui.js?v=20261012-lobby';
 import { partidaCerrada, puedeReanudar } from './partida.js?v=20261012-resume';
@@ -323,3 +324,5 @@ $('#btn-compartir').onclick = () => compartirTexto(`⛺🆚🏢 ¿Acampada en So
 const pintaVoz = () => ($('#btn-voz').textContent = voces.activado ? '🔊' : '🔇');
 $('#btn-voz').onclick = () => { voces.alternar(); pintaVoz(); };
 pintaVoz();
+
+iniciarTutorialInsultos();

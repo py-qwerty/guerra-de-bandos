@@ -522,5 +522,31 @@
    "audio/torres-f1b1bd370f.mp3",
    "audio/torres-d414104c1d.mp3"
   ]
+ },
+ "tutorial": {
+  "Jodido inútil.": [
+   "audio/tutorial-25c1e53ef6.mp3"
+  ],
+  "Jodido inútil, eso es el fondo, no un botón. Los botones están abajo y no muerden.": [
+   "audio/tutorial-892189760c.mp3"
+  ],
+  "A ver, pedazo de cabrón: pulsa Construir, eliges una tienda, un perroflauta o una planta de oficinas, y se coloca solita. Hasta tú puedes.": [
+   "audio/tutorial-f93567ebb4.mp3"
+  ],
+  "Pulsa Atacar, eliges la munición y tu gente dispara sola. No hay que apuntar, que ya sabemos que no sabes.": [
+   "audio/tutorial-c401381e66.mp3"
+  ],
+  "Arriba a la derecha tienes tus créditos del día. Gástalos, rácano, que mañana se recargan.": [
+   "audio/tutorial-da61750d4a.mp3"
+  ],
+  "Lo que rompes se queda roto para todos, así que rompe algo, coño, que para eso estás aquí.": [
+   "audio/tutorial-8d135c0595.mp3"
+  ],
+  "¿Sigues tocando el cielo? El cielo no es tuyo, inútil, es del casero.": [
+   "audio/tutorial-d48b7aeb54.mp3"
+  ],
+  "Llevas un rato sin hacer nada. ¿Eres del Juampe o qué? Construye o ataca, hostia ya.": [
+   "audio/tutorial-ce46182cb2.mp3"
+  ]
  }
 }

@@ -29,8 +29,8 @@ function buffer(url) {
 }
 
 // Canales: el ambiente (memes) habla de uno en uno; la acción (golpes, gritos) hasta 2 a la vez
-const LIMITE = { ambiente: 1, accion: 2 };
-const ocupados = { ambiente: 0, accion: 0 };
+const LIMITE = { ambiente: 1, accion: 2, tutorial: 1 };
+const ocupados = { ambiente: 0, accion: 0, tutorial: 0 };
 
 export const voces = {
   get activado() { return activado; },
@@ -44,7 +44,7 @@ export const voces = {
 export async function hablar(texto, { volumen = 0.8, bando, canal = 'accion' } = {}) {
   if (!activado || !ctx || ctx.state !== 'running' || ocupados[canal] >= LIMITE[canal]) return;
   await carga;
-  const lista = (bando && mapa?.[bando]?.[texto]) || mapa?.izquierda?.[texto] || mapa?.derecha?.[texto];
+  const lista = (bando && mapa?.[bando]?.[texto]) || mapa?.izquierda?.[texto] || mapa?.derecha?.[texto] || mapa?.tutorial?.[texto];
   if (!lista?.length) { console.warn('[voces] sin audio para:', texto); return; }
   ocupados[canal]++;
   let liberado = false;
@@ -58,5 +58,6 @@ export async function hablar(texto, { volumen = 0.8, bando, canal = 'accion' } =
     src.onended = liberar;
     setTimeout(liberar, buf.duration * 1000 + 500); // por si onended no llega
     src.start();
+    return buf.duration; // segundos, para encadenar frases
   } catch { liberar(); }
 }
