@@ -1,6 +1,6 @@
-import { adminApi } from './api.js';
-import { $ } from './ui.js';
-import { PIEZAS } from './sprites.js';
+import { adminApi } from './api.js?v=20261012-refresh1';
+import { $ } from './ui.js?v=20261012-refresh1';
+import { PIEZAS } from './sprites.js?v=20261012-refresh1';
 
 // La contraseña y la sesión solo viven en memoria; al cerrar el panel se borran.
 export function iniciarAdmin(alCambiar, posicionPara, prueba = {}) {

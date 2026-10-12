@@ -18,7 +18,7 @@ test('El administrador selecciona destinatario, añade saldo y construye para su
  const context=vm.createContext({document:d,Option:dom.window.Option,crypto:globalThis.crypto,Intl,Date,JSON,Number,String,Promise});
  const mods={'./api.js':{adminApi:api},'./ui.js':{$},'./sprites.js':{PIEZAS:pieces}};
  const module=new vm.SourceTextModule(fs.readFileSync(new URL('../src/admin.js',import.meta.url),'utf8'),{context});
- await module.link(spec=>{const ex=mods[spec];return new vm.SyntheticModule(Object.keys(ex),function(){for(const[k,v]of Object.entries(ex))this.setExport(k,v);},{context});});await module.evaluate();
+ await module.link(spec=>{const ex=mods[spec.split('?')[0]];return new vm.SyntheticModule(Object.keys(ex),function(){for(const[k,v]of Object.entries(ex))this.setExport(k,v);},{context});});await module.evaluate();
  module.namespace.iniciarAdmin(()=>{},async()=>({x:1050,y:714}),{jugador:()=>my,ocupado:()=>false,cambiar:async s=>{my=s;}});$('#btn-admin').click();$('#admin-password').value='test';$('#admin-login').dispatchEvent(new dom.window.Event('submit',{cancelable:true}));await flush();
  assert.equal($('#admin-test-left').disabled,true); $('#admin-test-right').click(); await flush();
  assert.equal(my.bando,'derecha'); assert.match($('#admin-my-team').textContent,/Torres/);

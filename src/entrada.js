@@ -1,7 +1,7 @@
 // Voz del narrador en la pantalla de entrada: mientras la gente pone su nombre o duda de bando,
 // le hace preguntas "sutiles". Empieza con el primer toque (el móvil no deja sonar antes).
-import { hablar } from './voces.js';
-import { $ } from './ui.js';
+import { hablar } from './voces.js?v=20261012-refresh1';
+import { $ } from './ui.js?v=20261012-refresh1';
 
 const FRASES = [
   '¿Qué eres, un puto rojo de mierda asqueroso, o una persona decente que trabaja en Indra o en Deloitte?',

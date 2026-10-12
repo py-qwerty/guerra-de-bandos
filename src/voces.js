@@ -8,7 +8,7 @@ let mapa = null;
 let activado = true;
 try { activado = localStorage.getItem('gdb_voces') !== 'off'; } catch {}
 
-const carga = fetch('audio/voces.json').then((r) => (r.ok ? r.json() : {})).then((m) => (mapa = m)).catch(() => (mapa = {}));
+const carga = fetch('audio/voces.json?v=20261012-refresh1').then((r) => (r.ok ? r.json() : {})).then((m) => (mapa = m)).catch(() => (mapa = {}));
 
 let ctx = null;
 function desbloquear() {
