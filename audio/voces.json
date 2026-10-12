@@ -548,5 +548,25 @@
   "Llevas un rato sin hacer nada. ¿Eres del Juampe o qué? Construye o ataca, hostia ya.": [
    "audio/tutorial-ce46182cb2.mp3"
   ]
+ },
+ "entrada": {
+  "¿Qué eres, un puto rojo de mierda asqueroso, o una persona decente que trabaja en Indra o en Deloitte?": [
+   "audio/entrada-8f2bf1915f.mp3"
+  ],
+  "¿Tú crees que las casas crecen en los árboles, o en la oferta y la demanda?": [
+   "audio/entrada-46e83a2406.mp3"
+  ],
+  "Venga, escribe tu nombre, que no tenemos todo el día. Bueno, los de la acampada sí.": [
+   "audio/entrada-e9953b2fd9.mp3"
+  ],
+  "¿Acampada en Sol o planta doce con café de máquina? Elige, que no muerde.": [
+   "audio/entrada-586b1e1e5c.mp3"
+  ],
+  "Si eliges la izquierda, trae tienda. Si eliges la derecha, trae corbata.": [
+   "audio/entrada-e183d6eeaa.mp3"
+  ],
+  "Piénsatelo bien, que aquí cambiarse de bando se llama ser tránsfuga.": [
+   "audio/entrada-2ea79a8ca1.mp3"
+  ]
  }
 }

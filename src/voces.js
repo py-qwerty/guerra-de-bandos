@@ -52,7 +52,7 @@ export async function hablar(texto, { volumen = 0.8, bando, canal = 'accion' } =
   if (!activado || !ctx || ctx.state !== 'running' || ocupados[canal] >= LIMITE[canal]) return;
   if (npcCallados && canal !== 'tutorial') return;
   await carga;
-  const lista = (bando && mapa?.[bando]?.[texto]) || mapa?.izquierda?.[texto] || mapa?.derecha?.[texto] || mapa?.tutorial?.[texto];
+  const lista = (bando && mapa?.[bando]?.[texto]) || mapa?.izquierda?.[texto] || mapa?.derecha?.[texto] || mapa?.tutorial?.[texto] || mapa?.entrada?.[texto];
   if (!lista?.length) { console.warn('[voces] sin audio para:', texto); return; }
   ocupados[canal]++;
   let liberado = false;
